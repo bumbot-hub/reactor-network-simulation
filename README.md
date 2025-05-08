@@ -10,13 +10,16 @@
 ## Simulation description
 
 ## Diagrams
-All diagrams in UML you can find here [Diagrams.vpp](https://github.com/bumbot-hub/nuclear-reactor-simulation/docs/diagrams/Diagrams.vpp)
-### Classes diagram
-![Class diagram](https://github.com/bumbot-hub/reactor-network-simulation/docs/diagrams/ClassDiagram.png)
+All diagrams in UML you can find here [Diagrams.vpp](/docs/diagrams/Diagrams.vpp)
+### Class diagram
+![Class diagram](/docs/diagrams/ClassDiagram.png)
 
 ### Objects diagram
-![Object diagram](https://github.com/bumbot-hub/reactor-network-simulation/docs/diagrams/ObjectDiagram.png)
+![Object diagram](/docs/diagrams/ObjectDiagram.png)
 
 ### Sequence diagram
+![Sequence diagram](/docs/diagrams/SequenceDiagram.png)
 
 ### State machine diagram
+![State machine diagram](/docs/diagrams/StateMachineDiagram.png)
+
