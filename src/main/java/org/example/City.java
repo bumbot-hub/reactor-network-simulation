@@ -41,13 +41,19 @@ public class City extends MapObject {
     }
 
     private void updateEnergyUsage() {
-        energyUsage = population * 0.82f;
+        energyUsage = population * 0.00082f;
     }
 
     public void info(){
-        System.out.println("City id " + getId());
-        System.out.print("Population: " + this.population + "\nRadius: " + this.cityRadius + "\nEnergy usage: " + this.energyUsage + "\n\n");
+        System.out.printf("\n\nCity id %d:\nObszar: %.2f\nPopulacja: %d\nZapotrzebowanie mocy: %.1f\nSkażenie: %.2f%%\n\n",
+                this.getId(),
+                cityRadius,
+                population,
+                energyUsage,
+                pollutionLevel
+        );
     }
+
 
     // Getters and setters
     public int getPopulation() {

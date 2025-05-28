@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -13,11 +14,12 @@ class Reactor extends MapObject {
 
     public Reactor(int id, float[] coordinates, float maxPower, int level) {
         super(id, coordinates);
+        this.connectedCities = new ArrayList<>();
         this.maxPower = maxPower;
         this.reactorLevel = level;
         this.currentPower = 0.0f;
         this.isMalfunction = false;
-        this.durability = 1;
+        this.durability = 1.0f;
     }
 
     @Override
@@ -48,12 +50,12 @@ class Reactor extends MapObject {
 
     private void updateDurability(){
         if(isMalfunction){
-            durability *= 0.95f;
+            durability *= 0.98f;
         }else{
             durability *= 0.997f;
         }
 
-        durability = Math.max(0, durability);
+        durability = Math.max(0.0f, durability);
     }
 
     private void updatePowerUsage(){
@@ -84,9 +86,14 @@ class Reactor extends MapObject {
         }
     }
 
-    public void info(){
-        System.out.println("Reactor id " + getId());
-        System.out.print("Max power: " + this.maxPower + "\nReactor level: "+ this.reactorLevel + "\nCurrent power: " + this.currentPower + "\nDurability: " + durability + "\n\n");
+    public void info() {
+        System.out.printf(
+                "\n\nReactor %d:\nMoc %.1f/%.1f \nWytrzymałość %.1f%%\n\n",
+                this.getId(),
+                currentPower,
+                maxPower,
+                durability * 100
+        );
     }
 
     public float getCurrentPower(){
