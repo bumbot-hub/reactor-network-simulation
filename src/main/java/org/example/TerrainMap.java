@@ -27,6 +27,21 @@ class TerrainMap {
         this.occupiedPositions = new ArrayList<>();
     }
 
+    public void update(){
+        windDirection = updateWind();
+        updateConnections();
+        for(City city: cities){
+            city.update();
+            city.info();
+        }
+
+        for(Reactor reactor: reactors){
+            reactor.update();
+            reactor.info();
+        }
+
+    }
+
     public String updateWind() {
         String[] values = {"N","NE","E","SE","S","SW","W","NW","C"};
         Random rand = new Random();
@@ -50,23 +65,36 @@ class TerrainMap {
         }
     }
 
-    public void updateConnections(List<Reactor> reactors, List<City> cities) {
+    public void updateConnections() {
+        for(City city: cities){
+            // Connect with reactor if connection is non-existing
+            if(city.getReactor() == null){
+                Reactor bestReactor = null;
+                double minDistance = Double.MAX_VALUE;
+
+                for(Reactor reactor: reactors){
+                    float leftPower = reactor.getMaxPower() - reactor.getCurrentPower();
+                    double distance = calculateDistance(city.getPosition(), reactor.getPosition());
+
+                    if(leftPower >= city.getEnergyUsage() * 1.10 & distance <= 70 & reactor.checkActivity()){
+                        if(distance < minDistance){
+                            minDistance = distance;
+                            bestReactor = reactor;
+                        }
+                    }
+                }
+
+                if(bestReactor != null){
+                    city.connectWithReactor(bestReactor);
+                }
+            }
+
+            // Disconnect with reactor if it's turned off
+        }
     }
 
-
-    public void update(){
-        updateConnections(reactors, cities);
-        for(City city: cities){
-            city.update();
-            city.info();
-        }
-
-        for(Reactor reactor: reactors){
-            reactor.update();
-            reactor.info();
-        }
-
-        windDirection = updateWind();
+    private double calculateDistance(float[] a, float[] b){
+        return Math.sqrt(Math.pow(a[0] - b[0],2) + Math.pow(a[1] - b[1],2));
     }
 
     public void visualize() {

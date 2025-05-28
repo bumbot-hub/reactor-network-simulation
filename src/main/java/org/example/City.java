@@ -16,7 +16,6 @@ public class City extends MapObject {
         this.pollutionLevel = 0;
 
         updateEnergyUsage();
-        connectWithReactor();
     }
 
     @Override
@@ -37,12 +36,12 @@ public class City extends MapObject {
         }
     }
 
-    private void updateEnergyUsage() {
-        energyUsage = population * 0.82f;
+    public void connectWithReactor(Reactor reactor){
+        this.reactor = reactor;
     }
 
-    public void connectWithReactor() {
-
+    private void updateEnergyUsage() {
+        energyUsage = population * 0.82f;
     }
 
     public void info(){

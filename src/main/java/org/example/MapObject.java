@@ -21,6 +21,10 @@ public abstract class MapObject {
         return id;
     }
 
+    public boolean checkActivity(){
+        return is_active;
+    }
+
     public void deactivateObject(){
         this.is_active = false;
     }

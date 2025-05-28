@@ -22,10 +22,11 @@ class Reactor extends MapObject {
 
     @Override
     public void update() {
+        updatePowerUsage();
         triggerMalfunction();
         updateDurability();
-        checkDeactivation();
         checkExplosion();
+        checkDeactivation();
     }
 
     private void triggerMalfunction() {
@@ -55,6 +56,18 @@ class Reactor extends MapObject {
         durability = Math.max(0, durability);
     }
 
+    private void updatePowerUsage(){
+        if(connectedCities != null){
+            float newUsage = 0;
+            for(City city: connectedCities){
+                newUsage += city.getEnergyUsage();
+            }
+            currentPower = newUsage;
+        }else{
+            currentPower = 0;
+        }
+    }
+
     private void checkDeactivation(){
         if(durability<0.01f){
             durability = 0;
@@ -74,5 +87,13 @@ class Reactor extends MapObject {
     public void info(){
         System.out.println("Reactor id " + getId());
         System.out.print("Max power: " + this.maxPower + "\nReactor level: "+ this.reactorLevel + "\nCurrent power: " + this.currentPower + "\nDurability: " + durability + "\n\n");
+    }
+
+    public float getCurrentPower(){
+        return currentPower;
+    }
+
+    public float getMaxPower(){
+        return maxPower;
     }
 }
