@@ -1,48 +1,53 @@
 package org.example;
 import java.util.Arrays;
+import java.util.Random;
 
 public class City extends MapObject {
     private int population;
     private float energyUsage;
     private float pollutionLevel;
     private Reactor reactor;
-    private int cityStatus;
-    private float cityRadius;
+    private double cityRadius;
 
-    public City(int id, float[] coordinates, int population, float energyUsage,
-                int cityStatus, float cityRadius) {
+    public City(int id, float[] coordinates, int population) {
         super(id, coordinates);
         this.population = population;
-        this.energyUsage = energyUsage;
-        this.cityStatus = cityStatus;
-        this.cityRadius = cityRadius;
-        this.pollutionLevel = 0; // Default value
+        this.cityRadius = Math.log(population)*2.3;
+        this.pollutionLevel = 0;
 
+        updateEnergyUsage();
         connectWithReactor();
     }
 
     @Override
     public void update() {
-        // Implementation of the abstract method
-        // Update city state based on pollution, energy availability, etc.
-        if (pollutionLevel > 0) {
-            affectPopulation();
-        }
+        updatePopulation();
         updateEnergyUsage();
     }
 
-    private void affectPopulation() {
-        // Reduce population based on pollution level
-        population = Math.max(0, population - (int) (pollutionLevel * 10));
+    private void updatePopulation() {
+        Random random = new Random();
+        float prob = random.nextFloat();
+
+        //Add logic with pollution level
+        if(prob>=0.6){
+            this.population += (int) (1.01+ random.nextFloat() * 0.031f); // 0,1% - 3,1% range
+        }else if(prob<=0.2){
+            this.population -= (int) (1.01+ random.nextFloat() * 0.031f); // 0,1% - 3,1% range
+        }
     }
 
     private void updateEnergyUsage() {
-        // Adjust energy usage based on population and city status
-        energyUsage = population * 0.1f * (cityStatus + 1);
+        energyUsage = population * 0.82f;
     }
 
     public void connectWithReactor() {
-        // this.reactor = new Reactor
+
+    }
+
+    public void info(){
+        System.out.println("City id " + getId());
+        System.out.print("Population: " + this.population + "\nRadius: " + this.cityRadius + "\nEnergy usage: " + this.energyUsage + "\n\n");
     }
 
     // Getters and setters
@@ -62,17 +67,11 @@ public class City extends MapObject {
         return reactor;
     }
 
-    public float getCityRadius() {
+    public double getCityRadius() {
         return cityRadius;
     }
 
     public void setPollutionLevel(float level) {
         pollutionLevel = level;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("City[id=, population=%,d, energy=%.1f, pollution=%.1f] @ %s", population, energyUsage, pollutionLevel,
-                Arrays.toString(getPosition()));
     }
 }

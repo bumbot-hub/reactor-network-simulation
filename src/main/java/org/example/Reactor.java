@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.List;
+import java.util.Random;
 
 class Reactor extends MapObject {
     private List<City> connectedCities;
@@ -10,27 +11,68 @@ class Reactor extends MapObject {
     private int reactorLevel;
     private float durability;
 
-    public Reactor(int id, float[] coordinates, float maxPower) {
+    public Reactor(int id, float[] coordinates, float maxPower, int level) {
         super(id, coordinates);
         this.maxPower = maxPower;
+        this.reactorLevel = level;
+        this.currentPower = 0.0f;
+        this.isMalfunction = false;
+        this.durability = 1;
     }
 
     @Override
     public void update() {
-
+        triggerMalfunction();
+        updateDurability();
+        checkDeactivation();
+        checkExplosion();
     }
 
-    public void triggerMalfunction(int reactorLevel, float durability) {
-        this.isMalfunction = true;
-        this.reactorLevel = reactorLevel;
-        this.durability = durability;
+    private void triggerMalfunction() {
+        float baseChance = 0.12f;
+        float levelModifier = 1.0f / reactorLevel;
+        float durabilityModifier = 1.0f - durability;
+        //float powerModifier = 1.0f - (currentPower/10000);
+        float totalChance = baseChance * levelModifier * (1.0f + durabilityModifier);
+
+        Random random = new Random();
+        float prob = random.nextFloat();
+
+        if(prob < totalChance) {
+            isMalfunction = true;
+        }else{
+            isMalfunction = false;
+        }
     }
 
-    public void update(int reactorLevel, List<City> connectedCities, float maxPower) {
-        this.reactorLevel = reactorLevel;
-        this.connectedCities = connectedCities;
-        this.maxPower = maxPower;
+    private void updateDurability(){
+        if(isMalfunction){
+            durability *= 0.95f;
+        }else{
+            durability *= 0.997f;
+        }
+
+        durability = Math.max(0, durability);
     }
 
+    private void checkDeactivation(){
+        if(durability<0.01f){
+            durability = 0;
+            this.deactivateObject();
+        }
+    }
 
+    private void checkExplosion(){
+        if(isMalfunction && durability < 0.3f && currentPower > maxPower * 0.85){
+            durability = 0;
+            this.deactivateObject();
+
+            //Create pollution object
+        }
+    }
+
+    public void info(){
+        System.out.println("Reactor id " + getId());
+        System.out.print("Max power: " + this.maxPower + "\nReactor level: "+ this.reactorLevel + "\nCurrent power: " + this.currentPower + "\nDurability: " + durability + "\n\n");
+    }
 }

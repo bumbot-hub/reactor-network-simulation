@@ -11,12 +11,13 @@ class Pollution {
         this.reactor = reactor;
     }
 
-    public void update(float currentRadius, float targetRadius, String windDirection) {
-        this.currentRadius = currentRadius;
-        this.targetRadius = targetRadius;
+    public void update(String windDirection) {
+        if(currentRadius<targetRadius){
+            currentRadius += 1;
+        }
     }
 
-    public float outRadius() {
+    public float getRadius() {
         return currentRadius;
     }
 
