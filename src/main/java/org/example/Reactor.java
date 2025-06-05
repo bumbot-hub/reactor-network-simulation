@@ -12,7 +12,7 @@ class Reactor extends MapObject {
     private int reactorLevel;
     private float durability;
 
-    public Reactor(int id, float[] coordinates, float maxPower, int level) {
+    public Reactor(int id, int[] coordinates, float maxPower, int level) {
         super(id, coordinates);
         this.connectedCities = new ArrayList<>();
         this.maxPower = maxPower;
@@ -35,7 +35,6 @@ class Reactor extends MapObject {
         float baseChance = 0.12f;
         float levelModifier = 1.0f / reactorLevel;
         float durabilityModifier = 1.0f - durability;
-        //float powerModifier = 1.0f - (currentPower/10000);
         float totalChance = baseChance * levelModifier * (1.0f + durabilityModifier);
 
         Random random = new Random();
@@ -54,7 +53,6 @@ class Reactor extends MapObject {
         }else{
             durability *= 0.997f;
         }
-
         durability = Math.max(0.0f, durability);
     }
 
@@ -84,6 +82,14 @@ class Reactor extends MapObject {
 
             //Create pollution object
         }
+    }
+
+    public void addCity(City city){
+        connectedCities.add(city);
+    }
+
+    public void removeCity(City city){
+        connectedCities.remove(city);
     }
 
     public void info() {

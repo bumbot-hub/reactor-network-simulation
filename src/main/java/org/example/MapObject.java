@@ -2,10 +2,10 @@ package org.example;
 
 public abstract class MapObject {
     private int id;
-    private float[] coordinates;
+    private int[] coordinates;
     private boolean is_active;
 
-    public MapObject(int id, float[] coordinates) {
+    public MapObject(int id, int[] coordinates) {
         this.id = id;
         this.coordinates = coordinates;
         this.is_active = true;
@@ -13,7 +13,7 @@ public abstract class MapObject {
 
     public abstract void update();
 
-    public float[] getPosition() {
+    public int[] getPosition() {
         return coordinates;
     }
 

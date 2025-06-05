@@ -1,5 +1,4 @@
 package org.example;
-import java.util.Arrays;
 import java.util.Random;
 
 public class City extends MapObject {
@@ -9,7 +8,7 @@ public class City extends MapObject {
     private Reactor reactor;
     private double cityRadius;
 
-    public City(int id, float[] coordinates, int population) {
+    public City(int id, int[] coordinates, int population) {
         super(id, coordinates);
         this.population = population;
         this.cityRadius = Math.log(population)*2.3;
