@@ -28,11 +28,10 @@ public class City extends MapObject {
         Random random = new Random();
         float prob = random.nextFloat();
 
-        //Add logic with pollution level
-        if(prob>=0.6){
-            this.population += (int) (1.01+ random.nextFloat() * 0.031f); // 0,1% - 3,1% range
-        }else if(prob<=0.2){
-            this.population -= (int) (1.01+ random.nextFloat() * 0.031f); // 0,1% - 3,1% range
+        if(prob>=0.35){
+            this.population += (int) (this.population*(1.01+ random.nextFloat() * 0.031f)); // 0,1% - 3,1% range
+        }else if(prob<=0.1){
+            this.population -= (int) (this.population*(1.01+ random.nextFloat() * 0.006f)); // 0,1% - 0,6% range
         }
     }
 
@@ -45,7 +44,7 @@ public class City extends MapObject {
     }
 
     public void info(){
-        System.out.printf("\n\nCity id %d:\nObszar: %.2f\nPopulacja: %d\nZapotrzebowanie mocy: %.1f\nSkażenie: %.2f%%\n\n",
+        System.out.printf("\n\nCity id %d:\nObszar: %.2f\nPopulacja: %d\nZapotrzebowanie mocy: %.6f\nSkażenie: %.2f%%\n\n",
                 this.getId(),
                 cityRadius,
                 population,
@@ -55,7 +54,6 @@ public class City extends MapObject {
     }
 
 
-    // Getters and setters
     public int getPopulation() {
         return population;
     }
