@@ -11,15 +11,28 @@ class Reactor extends MapObject {
     private boolean isMalfunction;
     private int reactorLevel;
     private float durability;
+    private TerrainMap mapRefference;
 
-    public Reactor(int id, int[] coordinates, float maxPower, int level) {
+    public Reactor(int id, int[] coordinates, int level, TerrainMap mapRefference) {
         super(id, coordinates);
         this.connectedCities = new ArrayList<>();
-        this.maxPower = maxPower;
         this.reactorLevel = level;
+        this.mapRefference = mapRefference;
+        this.maxPower = calculateMaxPower(level);
         this.currentPower = 0.0f;
         this.isMalfunction = false;
         this.durability = 1.0f;
+    }
+
+    private float calculateMaxPower(int level) {
+        Random random = new Random();
+        switch(level) {
+            case 1: return 50 + random.nextFloat() * 150;
+            case 2: return 200 + random.nextFloat() * 400;
+            case 3: return 600 + random.nextFloat() * 600;
+            case 4: return 1200 + random.nextFloat() * 400;
+            default: return 100;
+        }
     }
 
     @Override
@@ -38,45 +51,35 @@ class Reactor extends MapObject {
         float totalChance = baseChance * levelModifier * (1.0f + durabilityModifier);
 
         Random random = new Random();
-        float prob = random.nextFloat();
-
-        if(prob < totalChance) {
-            isMalfunction = true;
-        }else{
-            isMalfunction = false;
-        }
+        isMalfunction = random.nextFloat() < totalChance;
     }
 
     private void updateDurability(){
         if(isMalfunction){
             durability *= 0.98f;
-        }else{
+        } else {
             durability *= 0.997f;
         }
         durability = Math.max(0.0f, durability);
     }
 
     private void updatePowerUsage(){
-        if(connectedCities != null){
-            float newUsage = 0;
-            for(City city: connectedCities){
-                newUsage += city.getEnergyUsage();
-            }
-            currentPower = newUsage;
-        }else{
-            currentPower = 0;
+        float newUsage = 0;
+        for(City city: connectedCities){
+            newUsage += city.getEnergyUsage();
         }
+        currentPower = newUsage;
     }
 
     private void checkDeactivation(){
-        if(durability<0.01f){
+        if(durability < 0.01f){
             durability = 0;
             this.deactivateObject();
         }
     }
 
-    private void checkExplosion(){
-        if(isMalfunction && durability < 0.3f && currentPower > maxPower * 0.85){
+    private void checkExplosion() {
+        if (isMalfunction && durability < 0.3f && currentPower > maxPower * 0.85) {
             durability = 0;
             this.deactivateObject();
 
@@ -84,29 +87,33 @@ class Reactor extends MapObject {
         }
     }
 
-    public void addCity(City city){
+    public void addCity(City city) {
         connectedCities.add(city);
     }
 
-    public void removeCity(City city){
+    public void removeCity(City city) {
         connectedCities.remove(city);
     }
 
     public void info() {
-        System.out.printf(
-                "\n\nReactor %d:\nMoc %.1f/%.1f \nWytrzymałość %.1f%%\n\n",
+        System.out.printf("\nReaktor %d (Poziom %d):\n" +
+                        "   Moc: %.1f/%.1f MW\n" +
+                        "   Wytrzymałość: %.1f%%\n" +
+                        "   Połączonych miast: %d\n\n",
                 this.getId(),
+                reactorLevel,
                 currentPower,
                 maxPower,
-                durability * 100
+                durability * 100,
+                connectedCities.size()
         );
     }
 
-    public float getCurrentPower(){
-        return currentPower;
+    public float getCurrentPower() {
+            return currentPower;
     }
 
-    public float getMaxPower(){
-        return maxPower;
+    public float getMaxPower() {
+            return maxPower;
     }
 }

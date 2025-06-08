@@ -1,19 +1,20 @@
 package org.example;
+
 import java.util.Random;
 
 public class City extends MapObject {
     private int population;
+    private int originalPopulation;
     private float energyUsage;
     private float pollutionLevel;
     private Reactor reactor;
-    private double cityRadius;
+    private static final float ENERGY_PER_PERSON = 0.0005f;
 
     public City(int id, int[] coordinates, int population) {
         super(id, coordinates);
         this.population = population;
-        this.cityRadius = Math.log(population)*2.3;
+        this.originalPopulation = population;
         this.pollutionLevel = 0;
-
         updateEnergyUsage();
     }
 
@@ -27,11 +28,24 @@ public class City extends MapObject {
         Random random = new Random();
         float prob = random.nextFloat();
 
-        if(prob>=0.35){
-            this.population += (int) (this.population*(1.01+ random.nextFloat() * 0.031f)); // 0,1% - 3,1% range
-        }else if(prob<=0.1){
-            this.population -= (int) (this.population*(1.01+ random.nextFloat() * 0.006f)); // 0,1% - 0,6% range
+        int newPopulation = population;
+
+        if(prob >= 0.35) {
+            // Wzrost populacji: 0.1% - 3.1%
+            float growthRate = 0.001f + random.nextFloat() * 0.03f;
+            newPopulation += (int)(population * growthRate);
+        } else if(prob <= 0.1) {
+            // Spadek populacji: 0.1% - 0.6%
+            float declineRate = 0.001f + random.nextFloat() * 0.005f;
+            newPopulation -= (int)(population * declineRate);
         }
+
+        int minimumPopulation = (int)(originalPopulation * 0.9);
+        if (newPopulation < minimumPopulation) {
+            newPopulation = minimumPopulation;
+        }
+
+        this.population = newPopulation;
     }
 
     public void connectWithReactor(Reactor reactor){
@@ -39,19 +53,24 @@ public class City extends MapObject {
     }
 
     private void updateEnergyUsage() {
-        energyUsage = population * 0.00082f;
+        energyUsage = population * ENERGY_PER_PERSON;
     }
 
     public void info(){
-        System.out.printf("\n\nCity id %d:\nObszar: %.2f\nPopulacja: %d\nZapotrzebowanie mocy: %.6f\nSkażenie: %.2f%%\n\n",
+        System.out.printf("\n Miasto %d:\n" +
+                        "   Populacja: %,d (oryginalnie: %,d)\n" +
+                        "   Zapotrzebowanie: %.1f MW\n" +
+                        "   Skażenie: %.2f%%\n" +
+                        "   Reaktor: %s\n\n",
                 this.getId(),
-                cityRadius,
                 population,
+                originalPopulation,
                 energyUsage,
-                pollutionLevel
+                pollutionLevel,
+                (reactor != null && reactor.checkActivity()) ?
+                        String.format("#%d (%.1f MW)", reactor.getId(), reactor.getMaxPower()) : "BRAK"
         );
     }
-
 
     public int getPopulation() {
         return population;
@@ -67,10 +86,6 @@ public class City extends MapObject {
 
     public Reactor getReactor() {
         return reactor;
-    }
-
-    public double getCityRadius() {
-        return cityRadius;
     }
 
     public void setPollutionLevel(float level) {

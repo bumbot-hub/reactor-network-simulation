@@ -7,7 +7,10 @@ public abstract class MapObject {
 
     public MapObject(int id, int[] coordinates) {
         this.id = id;
-        this.coordinates = coordinates;
+        if (coordinates.length != 3) {
+            throw new IllegalArgumentException("Coordinates must be [x, y, z]");
+        }
+        this.coordinates = coordinates.clone();
         this.is_active = true;
     }
 
