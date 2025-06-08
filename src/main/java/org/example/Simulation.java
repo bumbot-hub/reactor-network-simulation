@@ -16,7 +16,7 @@ public class Simulation {
         );
         this.logger = new DataLogger();
         this.stepCounter = 0;
-        this.simulationDuration = 10;
+        this.simulationDuration = 100;
 
         initializeSimulation(initialCities, initialReactors);
     }
@@ -27,12 +27,14 @@ public class Simulation {
         }
 
         for (int i = 0; i < initialReactors; i++) {
-            terrain.generateReactor();
+            terrain.generateReactor(null);
         }
+        terrain.visualize();
     }
 
     public void run() {
         while (stepCounter < simulationDuration) {
+            terrain.updateStepInGUI(stepCounter);
             runStep();
         }
         printFinalStats();
@@ -53,12 +55,8 @@ public class Simulation {
     }
 
     private void generateNewObjects() {
-        if (stepCounter % 5 == 0 && terrain.getCities().size() < terrain.getMaxCities()) {
+        if (stepCounter % 3 == 0 && terrain.getCities().size() < terrain.getMaxCities()) {
             terrain.generateCity();
-        }
-
-        if (stepCounter % 12 == 0 && terrain.getReactors().size() < terrain.getMaxReactors()) {
-            terrain.generateReactor();
         }
     }
 

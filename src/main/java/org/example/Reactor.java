@@ -56,9 +56,9 @@ class Reactor extends MapObject {
 
     private void updateDurability(){
         if(isMalfunction){
-            durability *= 0.98f;
+            durability *= 0.94f;
         } else {
-            durability *= 0.997f;
+            durability *= 0.985f;
         }
         durability = Math.max(0.0f, durability);
     }
@@ -83,7 +83,12 @@ class Reactor extends MapObject {
             durability = 0;
             this.deactivateObject();
 
-            //Create pollution object
+            Pollution pollution = new Pollution(
+                    mapRefference.getPollutions().size() + 1,
+                    this.getPosition(),
+                    this
+            );
+            mapRefference.addPollution(pollution);
         }
     }
 
