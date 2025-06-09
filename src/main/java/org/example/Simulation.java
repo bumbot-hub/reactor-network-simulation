@@ -3,6 +3,8 @@ package org.example;
 import java.util.List;
 
 public class Simulation {
+    private static final ConfigLoader config = ConfigLoader.getInstance();
+
     private final TerrainMap terrain;
     private final DataLogger logger;
     private int stepCounter;
@@ -16,7 +18,7 @@ public class Simulation {
         );
         this.logger = new DataLogger();
         this.stepCounter = 0;
-        this.simulationDuration = 100;
+        this.simulationDuration = config.getSimulationDuration();
 
         initializeSimulation(initialCities, initialReactors);
     }
@@ -48,14 +50,14 @@ public class Simulation {
         logCurrentState();
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
 
     private void generateNewObjects() {
-        if (stepCounter % 3 == 0 && terrain.getCities().size() < terrain.getMaxCities()) {
+        if (stepCounter % config.getCityGenerationFrequency() == 0 && terrain.getCities().size() < terrain.getMaxCities()) {
             terrain.generateCity();
         }
     }

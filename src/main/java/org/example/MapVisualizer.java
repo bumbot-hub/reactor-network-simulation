@@ -5,8 +5,8 @@ import java.awt.*;
 
 public class MapVisualizer extends JPanel {
     private final TerrainMap terrainMap;
-    private final int REACTOR_SIZE = 15; // Zwiększone z 10
-    private final int CITY_SIZE = 12;    // Zwiększone z 8
+    private final int REACTOR_SIZE = 14;
+    private final int CITY_SIZE = 19;
     private JLabel windLabel;
     private JLabel stepLabel;
     private int currentStep = 0;
@@ -64,6 +64,11 @@ public class MapVisualizer extends JPanel {
         // Rysowanie reaktorów
         for (Reactor reactor : terrainMap.getReactors()) {
             int[] pos = reactor.getPosition();
+            if(reactor.checkActivity()){
+                g2d.setColor(Color.BLUE);
+            }else{
+                g2d.setColor(new Color(0, 0, 100)); // DARK_BLUE
+            }
             g2d.setColor(reactor.checkActivity() ? Color.BLUE : Color.DARK_GRAY);
             g2d.fillRect(pos[0], pos[1], REACTOR_SIZE, REACTOR_SIZE);
         }
@@ -71,14 +76,31 @@ public class MapVisualizer extends JPanel {
         // Rysowanie miast
         for (City city : terrainMap.getCities()) {
             int[] pos = city.getPosition();
-            g2d.setColor(Color.GREEN);
+            if(city.getPopulation() >= city.getOriginalPopulation() * 0.4){
+                g2d.setColor(Color.GREEN);
+            }else{
+                g2d.setColor(new Color(0, 100, 0)); // DARK_GREEN
+            }
             g2d.fillOval(pos[0], pos[1], CITY_SIZE, CITY_SIZE);
         }
 
         for (Pollution pollution : terrainMap.getPollutions()) {
+            if (!pollution.checkActivity()) continue;
+
             int[] pos = pollution.getPosition();
-            g2d.setColor(Color.YELLOW);
-            g2d.fillOval(pos[0], pos[1], CITY_SIZE, CITY_SIZE);
+
+            // Dynamiczny rozmiar bazowany na radius
+            int visualRadius = Math.round(pollution.getRadius() * 4); // skalowanie dla wizualizacji
+            int alpha = Math.round(255 * 0.4f);
+
+            Color pollutionColor = new Color(255, 255, 0, alpha);
+            g2d.setColor(pollutionColor);
+
+            // Rysowanie koła z dynamicznym rozmiarem
+            int x = pos[0] - visualRadius / 2;
+            int y = pos[1] - visualRadius / 2;
+            g2d.fillOval(x, y, visualRadius, visualRadius);
         }
+
     }
 }

@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class City extends MapObject {
     private int population;
-    private int originalPopulation;
+    private final int originalPopulation;
     private float energyUsage;
     private float pollutionLevel;
     private Reactor reactor;
@@ -30,14 +30,19 @@ public class City extends MapObject {
 
         int newPopulation = population;
 
-        if(prob >= 0.35) {
-            // Wzrost populacji: 0.1% - 3.1%
-            float growthRate = 0.001f + random.nextFloat() * 0.03f;
-            newPopulation += (int)(population * growthRate);
-        } else if(prob <= 0.1) {
-            // Spadek populacji: 0.1% - 0.6%
-            float declineRate = 0.001f + random.nextFloat() * 0.005f;
-            newPopulation -= (int)(population * declineRate);
+        if(pollutionLevel >= 20){
+            double reduction = 1.0 - (pollutionLevel / 100.0) * 0.75; // max 75% spadku przy 100% skażeniu
+            population *= (int) reduction;
+        }else{
+            if(prob >= 0.35) {
+                // Wzrost populacji: 0.1% - 3.1%
+                float growthRate = 0.001f + random.nextFloat() * 0.03f;
+                newPopulation += (int)(population * growthRate);
+            } else if(prob <= 0.1) {
+                // Spadek populacji: 0.1% - 0.6%
+                float declineRate = 0.001f + random.nextFloat() * 0.005f;
+                newPopulation -= (int)(population * declineRate);
+            }
         }
 
         int minimumPopulation = (int)(originalPopulation * 0.9);
@@ -74,6 +79,10 @@ public class City extends MapObject {
 
     public int getPopulation() {
         return population;
+    }
+
+    public int getOriginalPopulation(){
+        return originalPopulation;
     }
 
     public float getEnergyUsage() {

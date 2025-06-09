@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.Random;
 
 class Reactor extends MapObject {
+    private static final ConfigLoader config = ConfigLoader.getInstance();
     private List<City> connectedCities;
-    private float maxPower;
+    private final float maxPower;
     private float currentPower;
     private boolean isMalfunction;
-    private int reactorLevel;
+    private final int reactorLevel;
     private float durability;
-    private TerrainMap mapRefference;
+    private final TerrainMap mapRefference;
 
     public Reactor(int id, int[] coordinates, int level, TerrainMap mapRefference) {
         super(id, coordinates);
@@ -45,7 +46,7 @@ class Reactor extends MapObject {
     }
 
     private void triggerMalfunction() {
-        float baseChance = 0.12f;
+        float baseChance = config.getReactorMalfunctionBaseChance();
         float levelModifier = 1.0f / reactorLevel;
         float durabilityModifier = 1.0f - durability;
         float totalChance = baseChance * levelModifier * (1.0f + durabilityModifier);
@@ -56,9 +57,9 @@ class Reactor extends MapObject {
 
     private void updateDurability(){
         if(isMalfunction){
-            durability *= 0.94f;
+            durability *= config.getReactorDurabilityDecayMalfunction();
         } else {
-            durability *= 0.985f;
+            durability *= config.getReactorDurabilityDecayNormal();
         }
         durability = Math.max(0.0f, durability);
     }
@@ -79,14 +80,17 @@ class Reactor extends MapObject {
     }
 
     private void checkExplosion() {
-        if (isMalfunction && durability < 0.3f && currentPower > maxPower * 0.85) {
+        if (isMalfunction && durability < config.getReactorExplosionDurabilityThreshold() &&
+                currentPower > maxPower * config.getReactorExplosionPowerThreshold()) {
             durability = 0;
             this.deactivateObject();
 
             Pollution pollution = new Pollution(
                     mapRefference.getPollutions().size() + 1,
                     this.getPosition(),
-                    this
+                    this,
+                    mapRefference.getWindDirection(),
+                    mapRefference
             );
             mapRefference.addPollution(pollution);
         }

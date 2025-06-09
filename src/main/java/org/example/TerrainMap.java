@@ -6,13 +6,15 @@ import java.util.List;
 import java.util.Random;
 
 class TerrainMap {
+    private static final ConfigLoader config = ConfigLoader.getInstance();
+
     private List<City> cities;
     private List<Reactor> reactors;
     private String windDirection;
     private List<Pollution> pollutions;
-    private int[] dimensions;
-    private int maxCities;
-    private int maxReactors;
+    private final int[] dimensions;
+    private final int maxCities;
+    private final int maxReactors;
     private List<List<List<MapObject>>> occupiedPositions;
     private final int HEIGHT_LEVELS = 2;
     private MapVisualizer visualizer;
@@ -196,16 +198,35 @@ class TerrainMap {
         }
 
         while (attempts < MAX_ATTEMPTS) {
-            int x = random.nextInt(dimensions[0]);
-            int y = random.nextInt(dimensions[1]);
+            int x = 30 + random.nextInt(dimensions[0] - 60);
+            int y = 30 + random.nextInt(dimensions[1] - 60);
             int[] position = new int[]{x, y, z};
 
-            if (isPositionValid(position) && isPositionEmpty(position)) {
+            if (isPositionValid(position) && isPositionEmpty(position) && isFarEnoughFromOthers(position, 20)) {
                 return position;
             }
             attempts++;
         }
         return null;
+    }
+
+    private boolean isFarEnoughFromOthers(int[] position, int minDistance) {
+        for (City city : cities) {
+            if (calculateDistance(city.getPosition(), position) < minDistance) {
+                return false;
+            }
+        }
+        for (Reactor reactor : reactors) {
+            if (calculateDistance(reactor.getPosition(), position) < minDistance) {
+                return false;
+            }
+        }
+        for (Pollution pollution : pollutions) {
+            if (calculateDistance(pollution.getPosition(), position) < minDistance) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
@@ -237,8 +258,8 @@ class TerrainMap {
                 System.out.printf("Miasto %d -> Reaktor %d: odległość=%.1f, max=%.1f, dostępna_moc=%.1f, potrzebna=%.1f\n",
                         city.getId(), reactor.getId(), distance, maxDistance, availablePower, city.getEnergyUsage());
 
-                if (distance <= maxDistance && availablePower >= city.getEnergyUsage() * 1.05) { // Zmniejszony bufor z 1.10 na 1.05
-                    if (distance < minDistance) {
+                if(distance <= maxDistance && availablePower >= city.getEnergyUsage() * config.getEnergyConnectionPowerBuffer()) {
+                    if(distance < minDistance) {
                         minDistance = distance;
                         bestReactor = reactor;
                     }
@@ -255,7 +276,7 @@ class TerrainMap {
     }
 
     // Poprawiona metoda calculateDistance() - ignoruje współrzędną Z
-    private double calculateDistance(int[] a, int[] b) {
+    public double calculateDistance(int[] a, int[] b) {
         return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
     }
 
@@ -289,6 +310,7 @@ class TerrainMap {
     public List<City> getCities() {
         return new ArrayList<>(cities);
     }
+
     public List<Reactor> getReactors() {
         return new ArrayList<>(reactors);
     }
@@ -296,16 +318,12 @@ class TerrainMap {
     public List<Pollution> getPollutions() {
         return new ArrayList<>(pollutions);
     }
+
     public String getWindDirection() {
         return windDirection;
     }
+
     public int getMaxCities() {
         return maxCities;
-    }
-    public int getMaxReactors() {
-        return maxReactors;
-    }
-    public int[] getDimensions() {
-        return dimensions.clone();
     }
 }
