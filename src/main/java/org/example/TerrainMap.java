@@ -198,8 +198,8 @@ class TerrainMap {
         }
 
         while (attempts < MAX_ATTEMPTS) {
-            int x = 30 + random.nextInt(dimensions[0] - 60);
-            int y = 30 + random.nextInt(dimensions[1] - 60);
+            int x = 50 + random.nextInt(dimensions[0] - 100);
+            int y = 50 + random.nextInt(dimensions[1] - 100);
             int[] position = new int[]{x, y, z};
 
             if (isPositionValid(position) && isPositionEmpty(position) && isFarEnoughFromOthers(position, 20)) {
