@@ -16,19 +16,16 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("=== KONFIGURACJA SYMULACJI ===");
-
         int mapWidth = getValidInput(scanner, "Szerokość mapy (400-1000): ", 400, 1000);
         int mapHeight = getValidInput(scanner, "Wysokość mapy (400-1000): ", 400, 1000);
+
         int maxCitiesLimit = config.getMaxCities();
         int maxReactorsLimit = config.getMaxReactors();
 
-        int initialCities = getValidInput(scanner,
-                String.format("Początkowa liczba miast (1-%d): ", maxCitiesLimit), 1, maxCitiesLimit);
-        int initialReactors = getValidInput(scanner,
-                String.format("Początkowa liczba reaktorów (1-%d): ", maxReactorsLimit), 1, maxCitiesLimit);
+        int initialCities = getValidInput(scanner, String.format("Początkowa liczba miast (1-%d): ", maxCitiesLimit), 1, maxCitiesLimit);
+        int initialReactors = getValidInput(scanner, String.format("Początkowa liczba reaktorów (1-%d): ", maxReactorsLimit), 1, maxCitiesLimit);
 
         scanner.close();
-
         return new int[] { mapWidth, mapHeight, maxCitiesLimit, maxCitiesLimit, initialCities, initialReactors };
     }
 
