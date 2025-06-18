@@ -4,15 +4,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Klasa reprezentująca zanieczyszczenie promieniotwórcze powstałe w wyniku awarii reaktora.
+ * Zarządza swoim cyklem życia, rozprzestrzenianiem się, przemieszczaniem z wiatrem
+ * oraz oddziaływaniem na inne obiekty na mapie.
+ */
 class Pollution extends MapObject {
+    /** Aktualny kierunek wiatru wpływający na zanieczyszczenie. */
     private String windDirection;
+    /** Aktualny promień rażenia zanieczyszczenia. */
     private float radius;
+    /** Maksymalny możliwy promień rażenia zanieczyszczenia. */
     private final float maxRadius;
+    /** Wiek zanieczyszczenia (liczba kroków od powstania). */
     private int age;
+    /** Maksymalny wiek, po którym zanieczyszczenie znika. */
     private final int maxAge;
+    /** Wektor przemieszczenia zanieczyszczenia z wiatrem. */
     private int[] windDrift = {0, 0};
+    /** Referencja do mapy terenu, na której znajduje się obiekt. */
     private final TerrainMap mapReference;
 
+    /**
+     * Konstruktor obiektu Pollution.
+     * Inicjalizuje zanieczyszczenie na podstawie danych reaktora, który eksplodował.
+     *
+     * @param id unikalny identyfikator zanieczyszczenia
+     * @param reactorCoordinates współrzędne reaktora-źródła
+     * @param sourceReactor obiekt reaktora, który był źródłem
+     * @param windDirection aktualny kierunek wiatru w momencie powstania
+     * @param mapRef referencja do obiektu mapy terenu
+     */
     public Pollution(int id, int[] reactorCoordinates, Reactor sourceReactor,
                      String windDirection, TerrainMap mapRef) {
         super(id, new int[]{reactorCoordinates[0], reactorCoordinates[1], 1});
@@ -28,6 +50,11 @@ class Pollution extends MapObject {
         this.radius = initialRadius;
     }
 
+    /**
+     * Aktualizuje stan zanieczyszczenia w każdym kroku symulacji.
+     * Zwiększa wiek i promień, przemieszcza obiekt z wiatrem i oddziałuje na otoczenie.
+     * Dezaktywuje obiekt po osiągnięciu maksymalnego wieku.
+     */
     @Override
     public void update() {
         if (!checkActivity()) {
@@ -43,13 +70,12 @@ class Pollution extends MapObject {
             }
         }
 
-        // PRZEMIESZCZENIE Z WIATREM
         int[] drift = calculateWindDrift(windDirection);
         int[] currentPos = this.getPosition();
         int[] newPos = new int[]{
                 currentPos[0] + drift[0],
                 currentPos[1] + drift[1],
-                currentPos[2]  // Z pozostaje bez zmian
+                currentPos[2]
         };
 
         currentPos = newPos;
@@ -60,10 +86,19 @@ class Pollution extends MapObject {
         }
     }
 
+    /**
+     * Aktualizuje kierunek wiatru dla obiektu zanieczyszczenia.
+     *
+     * @param direction nowy kierunek wiatru
+     */
     public void updateWind(String direction){
         this.windDirection = direction;
     }
 
+    /**
+     * Sprawdza, które miasta i reaktory znajdują się w zasięgu zanieczyszczenia
+     * i oddziałuje na nie, zwiększając skażenie lub dezaktywując.
+     */
     private void affectNearby() {
         if (mapReference == null) return;
 
@@ -102,6 +137,12 @@ class Pollution extends MapObject {
 
     }
 
+    /**
+     * Oblicza wektor przemieszczenia zanieczyszczenia na podstawie kierunku wiatru.
+     *
+     * @param windDirection aktualny kierunek wiatru
+     * @return tablica [dx, dy] określająca wektor przemieszczenia
+     */
     private int[] calculateWindDrift(String windDirection) {
         // Mapowanie kierunków wiatru na wektory jednostkowe
         Map<String, int[]> windVectors = new HashMap<>();
@@ -126,6 +167,11 @@ class Pollution extends MapObject {
         return new int[]{deltaX, deltaY};
     }
 
+    /**
+     * Zwraca aktualny promień rażenia zanieczyszczenia.
+     *
+     * @return promień zanieczyszczenia
+     */
     public float getRadius() {
         return radius;
     }
